@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Position Size Pro</title>
+
+  <style>
+    body {
+      background: #0f1115;
+      color: white;
+      font-family: Arial;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 360px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .box {
+      flex: 1;
+    }
+
+    label {
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px;
+      margin-top: 6px;
+      background: #1a1d23;
+      border: 1px solid #2a2f38;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .result {
+      margin-top: 20px;
+      background: #1a1d23;
+      padding: 18px;
+      border-radius: 10px;
+    }
+
+    .result p {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+
+    .highlight {
+      color: #00d09c;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .price {
+      text-align: center;
+      margin-top: 10px;
+      color: #888;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Position Size</h2>
+
+  <div class="row">
+    <div class="box">
+      <label>Account Currency</label>
+      <input type="text" value="USD" disabled>
+    </div>
+
+    <div class="box">
+      <label>Instrument</label>
+      <select id="pair">
+        <option>EURUSD</option>
+        <option>AUDUSD</option>
+        <option>NZDUSD</option>
+        <option>USDJPY</option>
+        <option>USDCAD</option>
+        <option>XAUUSD</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="box">
+      <label>Risk Amount ($)</label>
+      <input type="number" id="risk" value="100">
+    </div>
+
+    <div class="box">
+      <label>Stop Loss (pips)</label>
+      <input type="number" id="sl" value="10">
+    </div>
+  </div>
+
+  <div class="price" id="price">Loading price...</div>
+
+  <div class="result">
+    <p>Standard Lots <span class="highlight" id="lot">0.00</span></p>
+    <p>Risk Amount <span id="riskResult">$0</span></p>
+  </div>
+
+</div>
+
+<script>
+
+let currentPrice = null;
+
+// FETCH PRICE
+async function getPrice(pair) {
+  try {
+
+    // GOLD FIX (REAL API)
+    if (pair === "XAUUSD") {
+      let res = await fetch("https://api.gold-api.com/price/XAUUSD");
+      let data = await res.json();
+
+      currentPrice = data.price;
+
+      document.getElementById("price").innerText =
+        "Gold Price: " + currentPrice.toFixed(2) + " 🟡";
+
+      calculate();
+      return;
+    }
+
+    // FOREX
+    let url = `https://api.frankfurter.app/latest?from=${pair.slice(0,3)}&to=${pair.slice(3,6)}`;
+    let res = await fetch(url);
+    let data = await res.json();
+
+    let quote = pair.slice(3,6);
+    currentPrice = data.rates[quote];
+
+    document.getElementById("price").innerText =
+      "Live Price: " + currentPrice.toFixed(4);
+
+  } catch {
+    document.getElementById("price").innerText = "Price unavailable ❌";
+    currentPrice = null;
+  }
+
+  calculate();
+}
+
+// CALCULATE
+function calculate() {
+  let risk = parseFloat(document.getElementById("risk").value);
+  let sl = parseFloat(document.getElementById("sl").value);
+  let pair = document.getElementById("pair").value;
+
+  if (!risk || !sl || !currentPrice) {
+    document.getElementById("lot").innerText = "0.00";
+    document.getElementById("riskResult").innerText = "$0";
+    return;
+  }
+
+  let pipValue;
+
+  if (pair === "EURUSD" || pair === "AUDUSD" || pair === "NZDUSD") {
+    pipValue = 10;
+  }
+  else if (pair === "USDJPY") {
+    pipValue = (0.01 / currentPrice) * 100000;
+  }
+  else if (pair === "USDCAD") {
+    pipValue = (0.0001 / currentPrice) * 100000;
+  }
+  else if (pair === "XAUUSD") {
+    pipValue = 1;
+  }
+
+  let lot = risk / (sl * pipValue);
+
+  document.getElementById("lot").innerText = lot.toFixed(2);
+  document.getElementById("riskResult").innerText = "$" + risk;
+}
+
+// EVENTS
+document.getElementById("pair").addEventListener("change", () => {
+  getPrice(document.getElementById("pair").value);
+});
+
+document.querySelectorAll("input").forEach(el => {
+  el.addEventListener("input", calculate);
+});
+
+// AUTO REFRESH
+setInterval(() => {
+  let pair = document.getElementById("pair").value;
+  getPrice(pair);
+}, 3000);
+
+// LOAD
+getPrice(document.getElementById("pair").value);
+
+</script>
+
+</body>
+</html>
