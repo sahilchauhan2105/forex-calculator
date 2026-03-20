@@ -1,167 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Forex Calculator Pro</title>
-
-  <style>
-    body {
-      background: #0b0e13;
-      color: white;
-      font-family: Arial;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .container {
-      width: 380px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
-
-    .card {
-      background: #151922;
-      padding: 18px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .box {
-      flex: 1;
-    }
-
-    label {
-      font-size: 12px;
-      color: #888;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 14px;
-      margin-top: 5px;
-      background: #0f131a;
-      border: 1px solid #2a2f38;
-      color: white;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    .price {
-      text-align: center;
-      color: #888;
-      margin-top: 10px;
-    }
-
-    .result {
-      background: #151922;
-      padding: 20px;
-      border-radius: 12px;
-    }
-
-    .result-item {
-      display: flex;
-      justify-content: space-between;
-      margin: 12px 0;
-      font-size: 15px;
-    }
-
-    .main-result {
-      font-size: 28px;
-      font-weight: bold;
-      color: #00ffae;
-    }
-
-    .tp {
-      color: #4cc9f0;
-      font-weight: bold;
-    }
-  </style>
-</head>
-
-<body>
-
-<div class="container">
-
-  <h2>Position Size</h2>
-
-  <div class="card">
-
-    <div class="row">
-      <div class="box">
-        <label>Currency</label>
-        <input value="USD" disabled>
-      </div>
-
-      <div class="box">
-        <label>Pair</label>
-        <select id="pair">
-          <option>EURUSD</option>
-          <option>AUDUSD</option>
-          <option>NZDUSD</option>
-          <option>USDJPY</option>
-          <option>USDCAD</option>
-          <option>XAUUSD</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="box">
-        <label>Risk ($)</label>
-        <input type="number" id="risk" value="100">
-      </div>
-
-      <div class="box">
-        <label>Stop Loss</label>
-        <input type="number" id="sl" value="10">
-      </div>
-    </div>
-
-    <label>Risk Reward (RR)</label>
-    <input type="number" id="rr" value="2">
-
-    <div class="price" id="price">Loading price...</div>
-
-  </div>
-
-  <div class="result">
-    <div class="result-item">
-      <span>Lot Size</span>
-      <span class="main-result" id="lot">0.00</span>
-    </div>
-
-    <div class="result-item">
-      <span>Risk</span>
-      <span id="riskResult">$0</span>
-    </div>
-
-    <div class="result-item">
-      <span>Take Profit</span>
-      <span class="tp" id="tp">0 pips</span>
-    </div>
-  </div>
-
-</div>
-
 <script>
 
 let currentPrice = null;
 
-// GOLD (STABLE)
+// 🔥 STABLE GOLD SYSTEM
 function getGoldPrice() {
-  let base = 2300 + (Math.random() * 20 - 10);
-  return base;
+  let saved = localStorage.getItem("goldPrice");
+
+  if (!saved) {
+    let base = 2300;
+    localStorage.setItem("goldPrice", base);
+    return base;
+  }
+
+  let price = parseFloat(saved);
+
+  // small realistic movement
+  let change = (Math.random() * 2 - 1); // -1 to +1
+  price += change;
+
+  localStorage.setItem("goldPrice", price);
+
+  return price;
 }
 
+// FETCH PRICE
 async function getPrice(pair) {
   try {
 
@@ -193,13 +55,14 @@ async function getPrice(pair) {
   calculate();
 }
 
+// CALCULATE
 function calculate() {
   let risk = parseFloat(document.getElementById("risk").value);
   let sl = parseFloat(document.getElementById("sl").value);
   let rr = parseFloat(document.getElementById("rr").value);
   let pair = document.getElementById("pair").value;
 
-  if (!risk || !sl) return;
+  if (!risk || !sl || !currentPrice) return;
 
   let pipValue;
 
@@ -238,9 +101,7 @@ setInterval(() => {
   getPrice(document.getElementById("pair").value);
 }, 3000);
 
+// INIT
 getPrice(document.getElementById("pair").value);
 
 </script>
-
-</body>
-</html>
