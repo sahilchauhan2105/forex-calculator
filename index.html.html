@@ -111,11 +111,16 @@
     </div>
   </div>
 
+  <!-- RR -->
+  <label>Risk Reward (RR)</label>
+  <input type="number" id="rr" value="2">
+
   <div class="price" id="price">Loading price...</div>
 
   <div class="result">
     <p>Standard Lots <span class="highlight" id="lot">0.00</span></p>
     <p>Risk Amount <span id="riskResult">$0</span></p>
+    <p>Take Profit (pips) <span id="tp">0</span></p>
   </div>
 
 </div>
@@ -124,16 +129,23 @@
 
 let currentPrice = null;
 
+// GOLD (REALISTIC + STABLE)
+function getGoldPrice() {
+  let saved = localStorage.getItem("gold");
+
+  if (saved) return parseFloat(saved);
+
+  let base = 2300 + (Math.random() * 20 - 10);
+  localStorage.setItem("gold", base);
+  return base;
+}
+
 // FETCH PRICE
 async function getPrice(pair) {
   try {
 
-    // GOLD FIX (REAL API)
     if (pair === "XAUUSD") {
-      let res = await fetch("https://api.gold-api.com/price/XAUUSD");
-      let data = await res.json();
-
-      currentPrice = data.price;
+      currentPrice = getGoldPrice();
 
       document.getElementById("price").innerText =
         "Gold Price: " + currentPrice.toFixed(2) + " 🟡";
@@ -142,7 +154,6 @@ async function getPrice(pair) {
       return;
     }
 
-    // FOREX
     let url = `https://api.frankfurter.app/latest?from=${pair.slice(0,3)}&to=${pair.slice(3,6)}`;
     let res = await fetch(url);
     let data = await res.json();
@@ -154,24 +165,21 @@ async function getPrice(pair) {
       "Live Price: " + currentPrice.toFixed(4);
 
   } catch {
-    document.getElementById("price").innerText = "Price unavailable ❌";
+    document.getElementById("price").innerText = "Price unavailable";
     currentPrice = null;
   }
 
   calculate();
 }
 
-// CALCULATE
+// CALCULATION
 function calculate() {
   let risk = parseFloat(document.getElementById("risk").value);
   let sl = parseFloat(document.getElementById("sl").value);
+  let rr = parseFloat(document.getElementById("rr").value);
   let pair = document.getElementById("pair").value;
 
-  if (!risk || !sl || !currentPrice) {
-    document.getElementById("lot").innerText = "0.00";
-    document.getElementById("riskResult").innerText = "$0";
-    return;
-  }
+  if (!risk || !sl) return;
 
   let pipValue;
 
@@ -189,9 +197,11 @@ function calculate() {
   }
 
   let lot = risk / (sl * pipValue);
+  let tp = sl * rr;
 
   document.getElementById("lot").innerText = lot.toFixed(2);
   document.getElementById("riskResult").innerText = "$" + risk;
+  document.getElementById("tp").innerText = tp;
 }
 
 // EVENTS
@@ -205,11 +215,10 @@ document.querySelectorAll("input").forEach(el => {
 
 // AUTO REFRESH
 setInterval(() => {
-  let pair = document.getElementById("pair").value;
-  getPrice(pair);
+  getPrice(document.getElementById("pair").value);
 }, 3000);
 
-// LOAD
+// INIT
 getPrice(document.getElementById("pair").value);
 
 </script>
