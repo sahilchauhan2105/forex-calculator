@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Position Size Pro</title>
+  <title>Forex Calculator Pro</title>
 
   <style>
     body {
-      background: #0f1115;
+      background: #0b0e13;
       color: white;
       font-family: Arial;
       display: flex;
@@ -14,12 +14,20 @@
     }
 
     .container {
-      width: 360px;
+      width: 380px;
     }
 
     h2 {
       text-align: center;
       margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .card {
+      background: #151922;
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 15px;
     }
 
     .row {
@@ -32,44 +40,49 @@
     }
 
     label {
-      font-size: 13px;
-      color: #aaa;
+      font-size: 12px;
+      color: #888;
     }
 
     input, select {
       width: 100%;
       padding: 14px;
-      margin-top: 6px;
-      background: #1a1d23;
+      margin-top: 5px;
+      background: #0f131a;
       border: 1px solid #2a2f38;
       color: white;
       border-radius: 8px;
-      font-size: 16px;
-    }
-
-    .result {
-      margin-top: 20px;
-      background: #1a1d23;
-      padding: 18px;
-      border-radius: 10px;
-    }
-
-    .result p {
-      display: flex;
-      justify-content: space-between;
-      margin: 10px 0;
-    }
-
-    .highlight {
-      color: #00d09c;
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 15px;
     }
 
     .price {
       text-align: center;
-      margin-top: 10px;
       color: #888;
+      margin-top: 10px;
+    }
+
+    .result {
+      background: #151922;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+      font-size: 15px;
+    }
+
+    .main-result {
+      font-size: 28px;
+      font-weight: bold;
+      color: #00ffae;
+    }
+
+    .tp {
+      color: #4cc9f0;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -80,47 +93,61 @@
 
   <h2>Position Size</h2>
 
-  <div class="row">
-    <div class="box">
-      <label>Account Currency</label>
-      <input type="text" value="USD" disabled>
+  <div class="card">
+
+    <div class="row">
+      <div class="box">
+        <label>Currency</label>
+        <input value="USD" disabled>
+      </div>
+
+      <div class="box">
+        <label>Pair</label>
+        <select id="pair">
+          <option>EURUSD</option>
+          <option>AUDUSD</option>
+          <option>NZDUSD</option>
+          <option>USDJPY</option>
+          <option>USDCAD</option>
+          <option>XAUUSD</option>
+        </select>
+      </div>
     </div>
 
-    <div class="box">
-      <label>Instrument</label>
-      <select id="pair">
-        <option>EURUSD</option>
-        <option>AUDUSD</option>
-        <option>NZDUSD</option>
-        <option>USDJPY</option>
-        <option>USDCAD</option>
-        <option>XAUUSD</option>
-      </select>
+    <div class="row">
+      <div class="box">
+        <label>Risk ($)</label>
+        <input type="number" id="risk" value="100">
+      </div>
+
+      <div class="box">
+        <label>Stop Loss</label>
+        <input type="number" id="sl" value="10">
+      </div>
     </div>
+
+    <label>Risk Reward (RR)</label>
+    <input type="number" id="rr" value="2">
+
+    <div class="price" id="price">Loading price...</div>
+
   </div>
-
-  <div class="row">
-    <div class="box">
-      <label>Risk Amount ($)</label>
-      <input type="number" id="risk" value="100">
-    </div>
-
-    <div class="box">
-      <label>Stop Loss (pips)</label>
-      <input type="number" id="sl" value="10">
-    </div>
-  </div>
-
-  <!-- RR -->
-  <label>Risk Reward (RR)</label>
-  <input type="number" id="rr" value="2">
-
-  <div class="price" id="price">Loading price...</div>
 
   <div class="result">
-    <p>Standard Lots <span class="highlight" id="lot">0.00</span></p>
-    <p>Risk Amount <span id="riskResult">$0</span></p>
-    <p>Take Profit (pips) <span id="tp">0</span></p>
+    <div class="result-item">
+      <span>Lot Size</span>
+      <span class="main-result" id="lot">0.00</span>
+    </div>
+
+    <div class="result-item">
+      <span>Risk</span>
+      <span id="riskResult">$0</span>
+    </div>
+
+    <div class="result-item">
+      <span>Take Profit</span>
+      <span class="tp" id="tp">0 pips</span>
+    </div>
   </div>
 
 </div>
@@ -129,18 +156,12 @@
 
 let currentPrice = null;
 
-// GOLD (REALISTIC + STABLE)
+// GOLD (STABLE)
 function getGoldPrice() {
-  let saved = localStorage.getItem("gold");
-
-  if (saved) return parseFloat(saved);
-
   let base = 2300 + (Math.random() * 20 - 10);
-  localStorage.setItem("gold", base);
   return base;
 }
 
-// FETCH PRICE
 async function getPrice(pair) {
   try {
 
@@ -148,7 +169,7 @@ async function getPrice(pair) {
       currentPrice = getGoldPrice();
 
       document.getElementById("price").innerText =
-        "Gold Price: " + currentPrice.toFixed(2) + " 🟡";
+        "Gold: " + currentPrice.toFixed(2) + " 🟡";
 
       calculate();
       return;
@@ -162,7 +183,7 @@ async function getPrice(pair) {
     currentPrice = data.rates[quote];
 
     document.getElementById("price").innerText =
-      "Live Price: " + currentPrice.toFixed(4);
+      "Price: " + currentPrice.toFixed(4);
 
   } catch {
     document.getElementById("price").innerText = "Price unavailable";
@@ -172,7 +193,6 @@ async function getPrice(pair) {
   calculate();
 }
 
-// CALCULATION
 function calculate() {
   let risk = parseFloat(document.getElementById("risk").value);
   let sl = parseFloat(document.getElementById("sl").value);
@@ -201,7 +221,7 @@ function calculate() {
 
   document.getElementById("lot").innerText = lot.toFixed(2);
   document.getElementById("riskResult").innerText = "$" + risk;
-  document.getElementById("tp").innerText = tp;
+  document.getElementById("tp").innerText = tp + " pips";
 }
 
 // EVENTS
@@ -218,7 +238,6 @@ setInterval(() => {
   getPrice(document.getElementById("pair").value);
 }, 3000);
 
-// INIT
 getPrice(document.getElementById("pair").value);
 
 </script>
