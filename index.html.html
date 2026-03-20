@@ -2,7 +2,7 @@
 
 let currentPrice = null;
 
-// 🔥 STABLE GOLD SYSTEM
+// ✅ GOLD (NO API — NEVER FAIL)
 function getGoldPrice() {
   let saved = localStorage.getItem("goldPrice");
 
@@ -14,8 +14,7 @@ function getGoldPrice() {
 
   let price = parseFloat(saved);
 
-  // small realistic movement
-  let change = (Math.random() * 2 - 1); // -1 to +1
+  let change = (Math.random() * 2 - 1);
   price += change;
 
   localStorage.setItem("goldPrice", price);
@@ -27,6 +26,7 @@ function getGoldPrice() {
 async function getPrice(pair) {
   try {
 
+    // 🔥 GOLD HANDLED HERE ONLY (NO FETCH)
     if (pair === "XAUUSD") {
       currentPrice = getGoldPrice();
 
@@ -37,6 +37,7 @@ async function getPrice(pair) {
       return;
     }
 
+    // FOREX ONLY
     let url = `https://api.frankfurter.app/latest?from=${pair.slice(0,3)}&to=${pair.slice(3,6)}`;
     let res = await fetch(url);
     let data = await res.json();
@@ -47,7 +48,7 @@ async function getPrice(pair) {
     document.getElementById("price").innerText =
       "Price: " + currentPrice.toFixed(4);
 
-  } catch {
+  } catch (error) {
     document.getElementById("price").innerText = "Price unavailable";
     currentPrice = null;
   }
