@@ -1,8 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Forex Calculator Pro</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #0b0e13, #0f1115);
+      color: white;
+      font-family: Arial;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* FLOATING PAIRS */
+    .floating {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .pair {
+      position: absolute;
+      color: rgba(255,255,255,0.05);
+      font-size: 20px;
+      animation: float 15s linear infinite;
+    }
+
+    @keyframes float {
+      from { transform: translateY(100vh); }
+      to { transform: translateY(-100vh); }
+    }
+
+    .container {
+      width: 380px;
+      z-index: 2;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .card {
+      background: rgba(21,25,34,0.9);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 20px rgba(0,255,170,0.05);
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .box {
+      flex: 1;
+    }
+
+    label {
+      font-size: 12px;
+      color: #888;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px;
+      margin-top: 5px;
+      background: #0f131a;
+      border: 1px solid #2a2f38;
+      color: white;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    input:focus, select:focus {
+      border-color: #00ffae;
+      outline: none;
+    }
+
+    .price {
+      text-align: center;
+      color: #aaa;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .result {
+      background: rgba(21,25,34,0.9);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,255,170,0.08);
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+    }
+
+    .main-result {
+      font-size: 30px;
+      font-weight: bold;
+      color: #00ffae;
+    }
+
+    .tp {
+      color: #4cc9f0;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- FLOATING PAIRS -->
+<div class="floating">
+  <div class="pair" style="left:10%; animation-duration:20s;">EURUSD</div>
+  <div class="pair" style="left:30%; animation-duration:18s;">AUDUSD</div>
+  <div class="pair" style="left:50%; animation-duration:22s;">NZDUSD</div>
+  <div class="pair" style="left:70%; animation-duration:17s;">USDJPY</div>
+  <div class="pair" style="left:85%; animation-duration:19s;">XAUUSD</div>
+</div>
+
+<div class="container">
+
+  <h2>Position Size</h2>
+
+  <div class="card">
+
+    <div class="row">
+      <div class="box">
+        <label>Currency</label>
+        <input value="USD" disabled>
+      </div>
+
+      <div class="box">
+        <label>Pair</label>
+        <select id="pair">
+          <option>EURUSD</option>
+          <option>AUDUSD</option>
+          <option>NZDUSD</option>
+          <option>USDJPY</option>
+          <option>USDCAD</option>
+          <option>XAUUSD</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="box">
+        <label>Risk ($)</label>
+        <input type="number" id="risk" value="100">
+      </div>
+
+      <div class="box">
+        <label>Stop Loss</label>
+        <input type="number" id="sl" value="10">
+      </div>
+    </div>
+
+    <label>Risk Reward (RR)</label>
+    <input type="number" id="rr" value="2">
+
+    <div class="price" id="price">Loading...</div>
+
+  </div>
+
+  <div class="result">
+    <div class="result-item">
+      <span>Lot Size</span>
+      <span class="main-result" id="lot">0.00</span>
+    </div>
+
+    <div class="result-item">
+      <span>Risk</span>
+      <span id="riskResult">$0</span>
+    </div>
+
+    <div class="result-item">
+      <span>Take Profit</span>
+      <span class="tp" id="tp">0 pips</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    Made by Sahil Chauhan 👑
+  </div>
+
+</div>
+
 <script>
 
 let currentPrice = null;
 
-// ✅ GOLD (NO API — NEVER FAIL)
+// GOLD STABLE
 function getGoldPrice() {
   let saved = localStorage.getItem("goldPrice");
 
@@ -13,20 +221,15 @@ function getGoldPrice() {
   }
 
   let price = parseFloat(saved);
-
-  let change = (Math.random() * 2 - 1);
-  price += change;
+  price += (Math.random() * 2 - 1);
 
   localStorage.setItem("goldPrice", price);
-
   return price;
 }
 
-// FETCH PRICE
 async function getPrice(pair) {
   try {
 
-    // 🔥 GOLD HANDLED HERE ONLY (NO FETCH)
     if (pair === "XAUUSD") {
       currentPrice = getGoldPrice();
 
@@ -37,7 +240,6 @@ async function getPrice(pair) {
       return;
     }
 
-    // FOREX ONLY
     let url = `https://api.frankfurter.app/latest?from=${pair.slice(0,3)}&to=${pair.slice(3,6)}`;
     let res = await fetch(url);
     let data = await res.json();
@@ -48,7 +250,7 @@ async function getPrice(pair) {
     document.getElementById("price").innerText =
       "Price: " + currentPrice.toFixed(4);
 
-  } catch (error) {
+  } catch {
     document.getElementById("price").innerText = "Price unavailable";
     currentPrice = null;
   }
@@ -56,7 +258,6 @@ async function getPrice(pair) {
   calculate();
 }
 
-// CALCULATE
 function calculate() {
   let risk = parseFloat(document.getElementById("risk").value);
   let sl = parseFloat(document.getElementById("sl").value);
@@ -88,7 +289,6 @@ function calculate() {
   document.getElementById("tp").innerText = tp + " pips";
 }
 
-// EVENTS
 document.getElementById("pair").addEventListener("change", () => {
   getPrice(document.getElementById("pair").value);
 });
@@ -97,12 +297,13 @@ document.querySelectorAll("input").forEach(el => {
   el.addEventListener("input", calculate);
 });
 
-// AUTO REFRESH
 setInterval(() => {
   getPrice(document.getElementById("pair").value);
 }, 3000);
 
-// INIT
 getPrice(document.getElementById("pair").value);
 
 </script>
+
+</body>
+</html>
