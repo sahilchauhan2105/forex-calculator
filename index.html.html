@@ -1,307 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Forex Calculator Pro</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forex Position Size Calculator</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: linear-gradient(180deg, #0b0e13, #0f1115);
-      color: white;
-      font-family: Arial;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-      overflow-x: hidden;
-    }
+<style>
 
-    /* FLOATING PAIRS */
-    .floating {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      overflow: hidden;
-    }
+/* ===== GLOBAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
 
-    .pair {
-      position: absolute;
-      color: rgba(255,255,255,0.05);
-      font-size: 20px;
-      animation: float 15s linear infinite;
-    }
+body {
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: white;
+  height: 100vh;
+  overflow-x: hidden;
+}
 
-    @keyframes float {
-      from { transform: translateY(100vh); }
-      to { transform: translateY(-100vh); }
-    }
+/* ===== CONTAINER ===== */
+.container {
+  max-width: 420px;
+  margin: auto;
+  margin-top: 60px;
+  padding: 25px;
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
+  transition: 0.4s;
+}
 
-    .container {
-      width: 380px;
-      z-index: 2;
-    }
+.container:hover {
+  box-shadow: 0 0 60px rgba(0, 255, 200, 0.3);
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: 600;
-    }
+/* ===== TITLE ===== */
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  background: linear-gradient(90deg, #00f5ff, #00ff88);
+  -webkit-background-clip: text;
+  color: transparent;
+}
 
-    .card {
-      background: rgba(21,25,34,0.9);
-      backdrop-filter: blur(10px);
-      padding: 18px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 20px rgba(0,255,170,0.05);
-    }
+/* ===== INPUTS ===== */
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 14px;
+}
 
-    .row {
-      display: flex;
-      gap: 10px;
-    }
+/* ===== BUTTON ===== */
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(90deg, #00f5ff, #00ff88);
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
 
-    .box {
-      flex: 1;
-    }
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #00ffcc;
+}
 
-    label {
-      font-size: 12px;
-      color: #888;
-    }
+/* ===== RESULT ===== */
+.result {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 12px;
+  background: rgba(0,255,150,0.1);
+  text-align: center;
+  font-size: 18px;
+}
 
-    input, select {
-      width: 100%;
-      padding: 14px;
-      margin-top: 5px;
-      background: #0f131a;
-      border: 1px solid #2a2f38;
-      color: white;
-      border-radius: 8px;
-      font-size: 15px;
-    }
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 12px;
+  opacity: 0.6;
+}
 
-    input:focus, select:focus {
-      border-color: #00ffae;
-      outline: none;
-    }
+/* ===== FLOATING LOGOS ===== */
+.floating-logos img {
+  position: absolute;
+  width: 40px;
+  opacity: 0.15;
+  animation: float 10s infinite linear;
+}
 
-    .price {
-      text-align: center;
-      color: #aaa;
-      margin-top: 10px;
-      font-size: 14px;
-    }
+.logo1 { top: 10%; left: 5%; }
+.logo2 { top: 30%; right: 10%; }
+.logo3 { bottom: 20%; left: 15%; }
+.logo4 { bottom: 10%; right: 20%; }
 
-    .result {
-      background: rgba(21,25,34,0.9);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,255,170,0.08);
-    }
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-25px); }
+  100% { transform: translateY(0px); }
+}
 
-    .result-item {
-      display: flex;
-      justify-content: space-between;
-      margin: 12px 0;
-    }
-
-    .main-result {
-      font-size: 30px;
-      font-weight: bold;
-      color: #00ffae;
-    }
-
-    .tp {
-      color: #4cc9f0;
-      font-weight: bold;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 12px;
-      color: #666;
-    }
-  </style>
+</style>
 </head>
 
 <body>
 
-<!-- FLOATING PAIRS -->
-<div class="floating">
-  <div class="pair" style="left:10%; animation-duration:20s;">EURUSD</div>
-  <div class="pair" style="left:30%; animation-duration:18s;">AUDUSD</div>
-  <div class="pair" style="left:50%; animation-duration:22s;">NZDUSD</div>
-  <div class="pair" style="left:70%; animation-duration:17s;">USDJPY</div>
-  <div class="pair" style="left:85%; animation-duration:19s;">XAUUSD</div>
+<!-- FLOATING LOGOS -->
+<div class="floating-logos">
+  <img src="https://cdn-icons-png.flaticon.com/512/555/555526.png" class="logo1">
+  <img src="https://cdn-icons-png.flaticon.com/512/555/555526.png" class="logo2">
+  <img src="https://cdn-icons-png.flaticon.com/512/555/555526.png" class="logo3">
+  <img src="https://cdn-icons-png.flaticon.com/512/555/555526.png" class="logo4">
 </div>
 
+<!-- MAIN APP -->
 <div class="container">
+  <h1>Forex Position Size</h1>
 
-  <h2>Position Size</h2>
+  <input type="number" id="balance" placeholder="Account Balance ($)">
+  <input type="number" id="risk" placeholder="Risk % (e.g. 1)">
+  <input type="number" id="stoploss" placeholder="Stop Loss (pips)">
 
-  <div class="card">
+  <select id="pair">
+    <option value="10">EURUSD</option>
+    <option value="10">GBPUSD</option>
+    <option value="10">AUDUSD</option>
+    <option value="10">NZDUSD</option>
+    <option value="9">USDJPY</option>
+    <option value="1">XAUUSD (Gold)</option>
+  </select>
 
-    <div class="row">
-      <div class="box">
-        <label>Currency</label>
-        <input value="USD" disabled>
-      </div>
+  <button onclick="calculateLot()">Calculate Lot Size</button>
 
-      <div class="box">
-        <label>Pair</label>
-        <select id="pair">
-          <option>EURUSD</option>
-          <option>AUDUSD</option>
-          <option>NZDUSD</option>
-          <option>USDJPY</option>
-          <option>USDCAD</option>
-          <option>XAUUSD</option>
-        </select>
-      </div>
-    </div>
+  <div class="result" id="result">Your lot size will appear here</div>
 
-    <div class="row">
-      <div class="box">
-        <label>Risk ($)</label>
-        <input type="number" id="risk" value="100">
-      </div>
-
-      <div class="box">
-        <label>Stop Loss</label>
-        <input type="number" id="sl" value="10">
-      </div>
-    </div>
-
-    <label>Risk Reward (RR)</label>
-    <input type="number" id="rr" value="2">
-
-    <div class="price" id="price">Loading...</div>
-
-  </div>
-
-  <div class="result">
-    <div class="result-item">
-      <span>Lot Size</span>
-      <span class="main-result" id="lot">0.00</span>
-    </div>
-
-    <div class="result-item">
-      <span>Risk</span>
-      <span id="riskResult">$0</span>
-    </div>
-
-    <div class="result-item">
-      <span>Take Profit</span>
-      <span class="tp" id="tp">0 pips</span>
-    </div>
-  </div>
-
-  <div class="footer">
-    Made by Sahil Chauhan 👑
-  </div>
-
+  <div class="footer">Made by Sahil Chauhan 🚀</div>
 </div>
 
 <script>
 
-let currentPrice = null;
-
-// GOLD STABLE
-function getGoldPrice() {
-  let saved = localStorage.getItem("goldPrice");
-
-  if (!saved) {
-    let base = 2300;
-    localStorage.setItem("goldPrice", base);
-    return base;
-  }
-
-  let price = parseFloat(saved);
-  price += (Math.random() * 2 - 1);
-
-  localStorage.setItem("goldPrice", price);
-  return price;
-}
-
-async function getPrice(pair) {
-  try {
-
-    if (pair === "XAUUSD") {
-      currentPrice = getGoldPrice();
-
-      document.getElementById("price").innerText =
-        "Gold: " + currentPrice.toFixed(2) + " 🟡";
-
-      calculate();
-      return;
-    }
-
-    let url = `https://api.frankfurter.app/latest?from=${pair.slice(0,3)}&to=${pair.slice(3,6)}`;
-    let res = await fetch(url);
-    let data = await res.json();
-
-    let quote = pair.slice(3,6);
-    currentPrice = data.rates[quote];
-
-    document.getElementById("price").innerText =
-      "Price: " + currentPrice.toFixed(4);
-
-  } catch {
-    document.getElementById("price").innerText = "Price unavailable";
-    currentPrice = null;
-  }
-
-  calculate();
-}
-
-function calculate() {
+function calculateLot() {
+  let balance = parseFloat(document.getElementById("balance").value);
   let risk = parseFloat(document.getElementById("risk").value);
-  let sl = parseFloat(document.getElementById("sl").value);
-  let rr = parseFloat(document.getElementById("rr").value);
-  let pair = document.getElementById("pair").value;
+  let sl = parseFloat(document.getElementById("stoploss").value);
+  let pipValue = parseFloat(document.getElementById("pair").value);
 
-  if (!risk || !sl || !currentPrice) return;
-
-  let pipValue;
-
-  if (pair === "EURUSD" || pair === "AUDUSD" || pair === "NZDUSD") {
-    pipValue = 10;
-  }
-  else if (pair === "USDJPY") {
-    pipValue = (0.01 / currentPrice) * 100000;
-  }
-  else if (pair === "USDCAD") {
-    pipValue = (0.0001 / currentPrice) * 100000;
-  }
-  else if (pair === "XAUUSD") {
-    pipValue = 1;
+  if (!balance || !risk || !sl) {
+    document.getElementById("result").innerText = "Please fill all fields";
+    return;
   }
 
-  let lot = risk / (sl * pipValue);
-  let tp = sl * rr;
+  let riskAmount = (balance * risk) / 100;
+  let lotSize = riskAmount / (sl * pipValue);
 
-  document.getElementById("lot").innerText = lot.toFixed(2);
-  document.getElementById("riskResult").innerText = "$" + risk;
-  document.getElementById("tp").innerText = tp + " pips";
+  document.getElementById("result").innerText =
+    "Lot Size: " + lotSize.toFixed(2);
 }
-
-document.getElementById("pair").addEventListener("change", () => {
-  getPrice(document.getElementById("pair").value);
-});
-
-document.querySelectorAll("input").forEach(el => {
-  el.addEventListener("input", calculate);
-});
-
-setInterval(() => {
-  getPrice(document.getElementById("pair").value);
-}, 3000);
-
-getPrice(document.getElementById("pair").value);
 
 </script>
 
