@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Position Size</title>
+
+<style>.quick-risk {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quick-risk button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #1f2937;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.quick-risk button:hover {
+  background: #10b981;
+  color: black;
+}
+body {
+  background: #0b1220;
+  color: white;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* CARD */
+.container {
+  width: 400px;
+  padding: 25px;
+  border-radius: 18px;
+  background: #111827;
+  box-shadow: 0 0 50px rgba(0,0,0,0.6);
+}
+
+/* TITLE */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* LABEL */
+label {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* INPUT */
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0 14px;
+  border-radius: 10px;
+  border: none;
+  background: #1f2937;
+  color: white;
+}
+
+/* RESULT */
+.result {
+  margin-top: 15px;
+  background: #1f2937;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.green { color: #10b981; }
+
+/* PRICE INPUT */
+#priceBox {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Position Size</h2>
+
+  <!-- PAIR -->
+  <label>Instrument</label>
+  <select id="pair" onchange="togglePrice(); calculate();">
+    <option value="EURUSD">EURUSD</option>
+    <option value="AUDUSD">AUDUSD</option>
+    <option value="NZDUSD">NZDUSD</option>
+    <option value="USDJPY">USDJPY</option>
+    <option value="USDCAD">USDCAD</option>
+    <option value="XAUUSD">XAUUSD</option>
+  </select>
+
+  <!-- PRICE -->
+  <div id="priceBox">
+    <label>Enter Price</label>
+    <input type="number" id="price" oninput="calculate()">
+  </div>
+
+  <!-- RISK -->
+ <label>Risk Amount ($)</label>
+<input type="number" id="risk" oninput="calculate()">
+
+<div class="quick-risk">
+  <button type="button" onclick="setRisk(50)">$50</button>
+  <button type="button" onclick="setRisk(100)">$100</button>
+  <button type="button" onclick="setRisk(250)">$250</button>
+</div>
+  <!-- SL -->
+  <label>Stop Loss (pips)</label>
+  <input type="number" id="sl" oninput="calculate()">
+
+  <!-- RESULT -->
+  <div class="result">
+    <div class="row">
+      <span>Lot Size</span>
+      <span class="green" id="lot">0.00</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function setRisk(value) {
+  document.getElementById("risk").value = value;
+  calculate();
+}
+
+
+function togglePrice() {
+  let pair = document.getElementById("pair").value;
+  let box = document.getElementById("priceBox");
+
+  if (pair === "USDJPY" || pair === "USDCAD" || pair === "XAUUSD") {
+    box.style.display = "block";
+  } else {
+    box.style.display = "none";
+  }
+}
+
+function calculate() {
+  let pair = document.getElementById("pair").value;
+  let risk = parseFloat(document.getElementById("risk").value);
+  let sl = parseFloat(document.getElementById("sl").value);
+  let price = parseFloat(document.getElementById("price").value);
+
+  if (!risk || !sl) return;
+
+  let pipValue;
+
+  if (pair === "EURUSD" || pair === "AUDUSD" || pair === "NZDUSD") {
+    pipValue = 10;
+  } 
+  else if (pair === "USDJPY") {
+    if (!price) return;
+    pipValue = 1000 / price;
+  } 
+  else if (pair === "USDCAD") {
+    if (!price) return;
+    pipValue = 10 / price;
+  } 
+  else if (pair === "XAUUSD") {
+    pipValue = 1;
+  }
+
+  let lot = risk / (sl * pipValue);
+
+  document.getElementById("lot").innerText = lot.toFixed(2);
+}
+
+</script>
+
+</body>
+</html>
