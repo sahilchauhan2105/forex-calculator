@@ -224,6 +224,9 @@ document.getElementById("installBtn").addEventListener("click", async () => {
     deferredPrompt = null;
   }
 });
+  if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
 
 </script>
 
