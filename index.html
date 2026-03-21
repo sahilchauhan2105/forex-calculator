@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="manifest" href="manifest.json">
+  <button id="installBtn" style="margin-top:10px; display:none;">
+  Install App
+</button>
+  <meta name="theme-color" content="#0b1220">
+<meta name="description" content="Forex Position Size Calculator by Sahil">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Position Size</title>
+<title>Sahil FX Calculator</title>
 
 <style>.quick-risk {
   display: flex;
@@ -135,6 +141,20 @@ input, select {
 </div>
 
 <script>
+  let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("installBtn").style.display = "block";
+});
+
+document.getElementById("installBtn").addEventListener("click", async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt = null;
+  }
+});
 function setRisk(value) {
   document.getElementById("risk").value = value;
   calculate();
