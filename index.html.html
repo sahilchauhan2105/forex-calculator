@@ -3,119 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forex Position Size Calculator</title>
+<title>Position Size Calculator</title>
 
 <style>
 
 /* ===== GLOBAL ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
-
 body {
-  background: linear-gradient(135deg, #0f172a, #020617);
+  background: #0b1220;
   color: white;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 100vh;
-  overflow-x: hidden;
 }
 
-/* ===== CONTAINER ===== */
+/* ===== CARD ===== */
 .container {
-  max-width: 420px;
-  margin: auto;
-  margin-top: 60px;
+  width: 380px;
   padding: 25px;
-  border-radius: 20px;
-  backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
-  transition: 0.4s;
-}
-
-.container:hover {
-  box-shadow: 0 0 60px rgba(0, 255, 200, 0.3);
+  border-radius: 16px;
+  background: #111827;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
 }
 
 /* ===== TITLE ===== */
 h1 {
   text-align: center;
   margin-bottom: 20px;
-  font-size: 24px;
-  background: linear-gradient(90deg, #00f5ff, #00ff88);
-  -webkit-background-clip: text;
-  color: transparent;
 }
 
-/* ===== INPUTS ===== */
+/* ===== LABEL ===== */
+label {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* ===== INPUT / SELECT ===== */
 input, select {
   width: 100%;
   padding: 12px;
-  margin: 10px 0;
+  margin-top: 5px;
+  margin-bottom: 15px;
   border-radius: 10px;
-  border: none;
-  outline: none;
-  background: rgba(255,255,255,0.08);
+  border: 1px solid #374151;
+  background: #1f2937;
   color: white;
   font-size: 14px;
+}
+
+/* FIX DROPDOWN ISSUE */
+select option {
+  background: #1f2937;
+  color: white;
 }
 
 /* ===== BUTTON ===== */
 button {
   width: 100%;
   padding: 14px;
-  margin-top: 10px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: none;
-  background: linear-gradient(90deg, #00f5ff, #00ff88);
+  background: #10b981;
   color: black;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
 }
 
 button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px #00ffcc;
+  background: #059669;
 }
 
 /* ===== RESULT ===== */
-.result {
+.result-box {
   margin-top: 20px;
   padding: 15px;
+  background: #1f2937;
   border-radius: 12px;
-  background: rgba(0,255,150,0.1);
-  text-align: center;
-  font-size: 18px;
 }
 
-/* ===== FOOTER ===== */
-.footer {
-  text-align: center;
-  margin-top: 15px;
-  font-size: 12px;
-  opacity: 0.6;
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
 }
 
-/* ===== FLOATING LOGOS ===== */
-.floating-logos img {
-  position: absolute;
-  width: 40px;
-  opacity: 0.15;
-  animation: float 10s infinite linear;
-}
-
-.logo1 { top: 10%; left: 5%; }
-.logo2 { top: 30%; right: 10%; }
-.logo3 { bottom: 20%; left: 15%; }
-.logo4 { bottom: 10%; right: 20%; }
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-25px); }
-  100% { transform: translateY(0px); }
+.green {
+  color: #10b981;
+  font-weight: bold;
 }
 
 </style>
@@ -123,22 +98,11 @@ button:hover {
 
 <body>
 
-<!-- FLOATING LOGOS -->
-<div class="floating-logos">
-  <img src="https://cdn-icons-png.flaticon.com/512/555/555526.png" class="logo1">
-  <img src="https://cdn-icons-png.flaticon.com/512/555/555526.png" class="logo2">
-  <img src="https://cdn-icons-png.flaticon.com/512/555/555526.png" class="logo3">
-  <img src="https://cdn-icons-png.flaticon.com/512/555/555526.png" class="logo4">
-</div>
-
-<!-- MAIN APP -->
 <div class="container">
-  <h1>Forex Position Size</h1>
+  <h1>Position Size</h1>
 
-  <input type="number" id="balance" placeholder="Account Balance ($)">
-  <input type="number" id="risk" placeholder="Risk % (e.g. 1)">
-  <input type="number" id="stoploss" placeholder="Stop Loss (pips)">
-
+  <!-- Instrument -->
+  <label>Instrument</label>
   <select id="pair">
     <option value="10">EURUSD</option>
     <option value="10">GBPUSD</option>
@@ -148,31 +112,45 @@ button:hover {
     <option value="1">XAUUSD (Gold)</option>
   </select>
 
-  <button onclick="calculateLot()">Calculate Lot Size</button>
+  <!-- Risk Amount -->
+  <label>Risk Amount ($)</label>
+  <input type="number" id="risk" placeholder="Enter risk amount">
 
-  <div class="result" id="result">Your lot size will appear here</div>
+  <!-- Stop Loss -->
+  <label>Stop Loss (pips)</label>
+  <input type="number" id="sl" placeholder="Enter stop loss">
 
-  <div class="footer">Made by Sahil Chauhan 🚀</div>
+  <button onclick="calculate()">Calculate</button>
+
+  <!-- RESULT -->
+  <div class="result-box">
+    <div class="result-row">
+      <span>Standard Lots</span>
+      <span class="green" id="lot">0.00</span>
+    </div>
+    <div class="result-row">
+      <span>Risk Amount</span>
+      <span id="riskShow">$0</span>
+    </div>
+  </div>
 </div>
 
 <script>
 
-function calculateLot() {
-  let balance = parseFloat(document.getElementById("balance").value);
+function calculate() {
   let risk = parseFloat(document.getElementById("risk").value);
-  let sl = parseFloat(document.getElementById("stoploss").value);
-  let pipValue = parseFloat(document.getElementById("pair").value);
+  let sl = parseFloat(document.getElementById("sl").value);
+  let pip = parseFloat(document.getElementById("pair").value);
 
-  if (!balance || !risk || !sl) {
-    document.getElementById("result").innerText = "Please fill all fields";
+  if (!risk || !sl) {
+    alert("Fill all fields");
     return;
   }
 
-  let riskAmount = (balance * risk) / 100;
-  let lotSize = riskAmount / (sl * pipValue);
+  let lot = risk / (sl * pip);
 
-  document.getElementById("result").innerText =
-    "Lot Size: " + lotSize.toFixed(2);
+  document.getElementById("lot").innerText = lot.toFixed(2);
+  document.getElementById("riskShow").innerText = "$" + risk;
 }
 
 </script>
