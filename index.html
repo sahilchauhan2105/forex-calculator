@@ -7,15 +7,15 @@
 <title>Sahil FX Calculator</title>
 
 <meta name="theme-color" content="#0b1220">
-<meta name="description" content="Forex Position Size Calculator by Sahil">
-
 <link rel="manifest" href="manifest.json">
 
 <style>
 body {
   margin: 0;
   font-family: sans-serif;
-  background: radial-gradient(circle at top, #0f172a, #020617);
+  background:
+    radial-gradient(circle at top, #0f172a, #020617),
+    radial-gradient(circle at 80% 20%, rgba(16,185,129,0.15), transparent 40%);
   color: white;
   overflow: hidden;
 }
@@ -30,12 +30,15 @@ body {
 
 .card {
   position: absolute;
-  padding: 10px 15px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-  font-size: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  font-size: 13px;
   animation: floatUp 12s linear infinite;
+  opacity: 0.9;
 }
 
 .card:nth-child(1) { left: 10%; animation-delay: 0s; }
@@ -51,30 +54,40 @@ body {
 
 /* CONTAINER */
 .container {
+  position: relative;
+  z-index: 10;
   width: 90%;
   max-width: 400px;
   margin: auto;
   margin-top: 60px;
   padding: 25px;
   border-radius: 20px;
+
   background: rgba(17,24,39,0.6);
   backdrop-filter: blur(20px);
-  box-shadow: 0 0 40px rgba(0,0,0,0.5);
+
+  box-shadow:
+    0 0 40px rgba(0,0,0,0.6),
+    0 0 20px rgba(16,185,129,0.2);
 }
 
-/* TITLE */
+/* HEADER */
 h2 {
   text-align: center;
-  margin-bottom: 20px;
 }
 
-/* LABEL */
-label {
-  font-size: 13px;
+.title-main {
+  color: #10b981;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.title-sub {
+  font-size: 12px;
   color: #9ca3af;
 }
 
-/* INPUT PREMIUM */
+/* INPUT */
 input, select {
   width: 100%;
   padding: 12px;
@@ -89,22 +102,26 @@ input, select {
 .quick-risk {
   display: flex;
   gap: 10px;
-  margin-bottom: 10px;
 }
 
 .quick-risk button {
   flex: 1;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 10px;
   border: none;
-  background: #1f2937;
+  font-weight: bold;
   color: white;
-  cursor: pointer;
+  background: rgba(255,255,255,0.08);
+  transition: 0.3s;
 }
 
+.quick-risk button:nth-child(1) { border: 1px solid #3b82f6; }
+.quick-risk button:nth-child(2) { border: 1px solid #64748b; }
+.quick-risk button:nth-child(3) { border: 1px solid #ef4444; }
+
 .quick-risk button:hover {
-  background: #10b981;
-  color: black;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255,255,255,0.2);
 }
 
 /* RESULT */
@@ -113,35 +130,43 @@ input, select {
   background: rgba(255,255,255,0.05);
   padding: 15px;
   border-radius: 12px;
+  position: relative;
 }
 
-.row {
-  display: flex;
-  justify-content: space-between;
+.result::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #10b981, transparent);
+  box-shadow: 0 0 10px #10b981;
 }
 
 #lot {
   font-size: 28px;
   color: #10b981;
-  text-shadow: 0 0 10px #10b981;
+  text-shadow: 0 0 15px #10b981;
 }
 
 /* INSTALL BUTTON */
 #installBtn {
-  margin-top: 15px;
+  margin-top: 20px;
   width: 100%;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 14px;
+  border-radius: 14px;
   border: none;
-  background: linear-gradient(90deg, #3b82f6, #06b6d4);
-  color: white;
+  font-size: 16px;
   font-weight: bold;
-  box-shadow: 0 0 20px rgba(59,130,246,0.5);
-  display: none;
-}
+  color: white;
 
-/* PRICE INPUT */
-#priceBox {
+  background: linear-gradient(90deg, #1e3a8a, #06b6d4);
+
+  box-shadow:
+    0 0 25px rgba(59,130,246,0.6),
+    inset 0 0 10px rgba(255,255,255,0.2);
+
   display: none;
 }
 </style>
@@ -149,28 +174,32 @@ input, select {
 
 <body>
 
-<!-- FLOATING CARDS (CORRECT PLACE ✅) -->
+<!-- FLOATING CARDS -->
 <div class="floating-cards">
-  <div class="card">EURUSD<br>1.0912</div>
-  <div class="card">GBPUSD<br>1.2704</div>
-  <div class="card">USDJPY<br>153.67</div>
-  <div class="card">XAUUSD<br>2025</div>
+  <div class="card">🇪🇺 EURUSD<br>1.0912</div>
+  <div class="card">🇬🇧 GBPUSD<br>1.2704</div>
+  <div class="card">🇯🇵 USDJPY<br>153.67</div>
+  <div class="card">🟡 XAUUSD<br>2025</div>
 </div>
 
 <div class="container">
-  <h2>Sahil FX Calculator</h2>
+  
+  <h2>
+    <div class="title-main">SAHIL FX</div>
+    <div class="title-sub">CALCULATOR</div>
+  </h2>
 
   <label>Instrument</label>
   <select id="pair" onchange="togglePrice(); calculate();">
-    <option value="EURUSD">EURUSD</option>
-    <option value="AUDUSD">AUDUSD</option>
-    <option value="NZDUSD">NZDUSD</option>
-    <option value="USDJPY">USDJPY</option>
-    <option value="USDCAD">USDCAD</option>
-    <option value="XAUUSD">XAUUSD</option>
+    <option value="EURUSD">🇪🇺 🇺🇸 EUR/USD</option>
+    <option value="AUDUSD">🇦🇺 🇺🇸 AUD/USD</option>
+    <option value="NZDUSD">🇳🇿 🇺🇸 NZD/USD</option>
+    <option value="USDJPY">🇺🇸 🇯🇵 USD/JPY</option>
+    <option value="USDCAD">🇺🇸 🇨🇦 USD/CAD</option>
+    <option value="XAUUSD">🟡 XAU/USD</option>
   </select>
 
-  <div id="priceBox">
+  <div id="priceBox" style="display:none;">
     <label>Enter Price</label>
     <input type="number" id="price" oninput="calculate()">
   </div>
@@ -188,20 +217,19 @@ input, select {
   <input type="number" id="sl" oninput="calculate()">
 
   <div class="result">
-    <div class="row">
+    <div style="display:flex; justify-content:space-between;">
       <span>Lot Size</span>
       <span id="lot">0.00</span>
     </div>
   </div>
 
-  <button id="installBtn">Install App</button>
+  <button id="installBtn">⬇ INSTALL APP</button>
 </div>
 
 <script>
 function togglePrice() {
   let pair = document.getElementById("pair").value;
   let box = document.getElementById("priceBox");
-
   box.style.display =
     (pair === "USDJPY" || pair === "USDCAD" || pair === "XAUUSD")
     ? "block" : "none";
