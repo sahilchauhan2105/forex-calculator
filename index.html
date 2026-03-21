@@ -1,37 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="manifest.json">
-  <button id="installBtn" style="margin-top:10px; display:none;">
-  Install App
-</button>
-  <meta name="theme-color" content="#0b1220">
-<meta name="description" content="Forex Position Size Calculator by Sahil">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Sahil FX Calculator</title>
 
-<style>.quick-risk {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="Forex Position Size Calculator by Sahil">
 
-.quick-risk button {
-  flex: 1;
-  padding: 8px;
-  border-radius: 8px;
-  border: none;
-  background: #1f2937;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
-}
+<link rel="manifest" href="manifest.json">
 
-.quick-risk button:hover {
-  background: #10b981;
-  color: black;
-}
+<style>
 body {
   background: #0b1220;
   color: white;
@@ -48,7 +28,6 @@ body {
   padding: 25px;
   border-radius: 18px;
   background: #111827;
-  box-shadow: 0 0 50px rgba(0,0,0,0.6);
 }
 
 /* TITLE */
@@ -67,11 +46,33 @@ label {
 input, select {
   width: 100%;
   padding: 12px;
-  margin: 6px 0 14px;
+  margin: 6px 0 10px;
   border-radius: 10px;
   border: none;
   background: #1f2937;
   color: white;
+}
+
+/* QUICK RISK */
+.quick-risk {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quick-risk button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  background: #1f2937;
+  color: white;
+  cursor: pointer;
+}
+
+.quick-risk button:hover {
+  background: #10b981;
+  color: black;
 }
 
 /* RESULT */
@@ -89,6 +90,18 @@ input, select {
 
 .green { color: #10b981; }
 
+/* INSTALL BUTTON */
+#installBtn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  display: none;
+}
+
 /* PRICE INPUT */
 #priceBox {
   display: none;
@@ -99,7 +112,7 @@ input, select {
 <body>
 
 <div class="container">
-  <h2>Position Size</h2>
+  <h2>Sahil FX Calculator</h2>
 
   <!-- PAIR -->
   <label>Instrument</label>
@@ -119,14 +132,16 @@ input, select {
   </div>
 
   <!-- RISK -->
- <label>Risk Amount ($)</label>
-<input type="number" id="risk" oninput="calculate()">
+  <label>Risk Amount ($)</label>
+  <input type="number" id="risk" oninput="calculate()">
 
-<div class="quick-risk">
-  <button type="button" onclick="setRisk(50)">$50</button>
-  <button type="button" onclick="setRisk(100)">$100</button>
-  <button type="button" onclick="setRisk(250)">$250</button>
-</div>
+  <!-- QUICK BUTTONS -->
+  <div class="quick-risk">
+    <button type="button" onclick="setRisk(50)">$50</button>
+    <button type="button" onclick="setRisk(100)">$100</button>
+    <button type="button" onclick="setRisk(250)">$250</button>
+  </div>
+
   <!-- SL -->
   <label>Stop Loss (pips)</label>
   <input type="number" id="sl" oninput="calculate()">
@@ -138,29 +153,14 @@ input, select {
       <span class="green" id="lot">0.00</span>
     </div>
   </div>
+
+  <!-- INSTALL BUTTON -->
+  <button id="installBtn">Install App</button>
 </div>
 
 <script>
-  let deferredPrompt;
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById("installBtn").style.display = "block";
-});
-
-document.getElementById("installBtn").addEventListener("click", async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt = null;
-  }
-});
-function setRisk(value) {
-  document.getElementById("risk").value = value;
-  calculate();
-}
-
-
+/* SHOW PRICE INPUT */
 function togglePrice() {
   let pair = document.getElementById("pair").value;
   let box = document.getElementById("priceBox");
@@ -172,6 +172,13 @@ function togglePrice() {
   }
 }
 
+/* QUICK RISK */
+function setRisk(value) {
+  document.getElementById("risk").value = value;
+  calculate();
+}
+
+/* CALCULATION */
 function calculate() {
   let pair = document.getElementById("pair").value;
   let risk = parseFloat(document.getElementById("risk").value);
@@ -201,6 +208,22 @@ function calculate() {
 
   document.getElementById("lot").innerText = lot.toFixed(2);
 }
+
+/* INSTALL APP */
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("installBtn").style.display = "block";
+});
+
+document.getElementById("installBtn").addEventListener("click", async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt = null;
+  }
+});
 
 </script>
 
